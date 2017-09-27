@@ -34,9 +34,12 @@ def checkIP(ip):
 				b = ip[i:j]
 				c = ip[j:k]
 				d = ip[k:]
-				if( int(a)<256 and int(b)<256 and int(c)<256 and int(d)<256 and len(d)<4):
-					addr = a + '.' + b + '.' + c + '.' + d
+				addr = a + '.' + b + '.' + c + '.' + d
+				try:
+					socket.inet_aton(addr)
 					ans.append(addr)
+				except Exception:
+					pass					
 
 	privMsg(str(len(ans)))
 	for cnt in range(len(ans)):
