@@ -4,6 +4,7 @@ import socket
 IRCSocket = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
 HOST = 'irc.freenode.net'
 PORT = 6667
+
 # read channel from config
 with open('config') as f:
 	CHANNEL = f.read().split('CHAN=')[1][1:-1]
@@ -16,6 +17,7 @@ def privMsg(msg):
 
 def sendMsg(msg):
 	msg += '\r\n'
+	print('OuO ' + msg)
 	IRCSocket.send( bytes(msg, 'utf-8') )
 
 
@@ -73,8 +75,8 @@ def main():
 	sendMsg('JOIN ' + CHANNEL)
 	privMsg('Hello! I am robot.')
 
-	while True :
-		IRCMsg = str(IRCSocket.recv( 4096 ).decode('utf-8'))
+	while True:
+		IRCMsg = str(IRCSocket.recv( 1024 ).decode('utf-8'))
 		print(IRCMsg)
 
 		# ping-pong
