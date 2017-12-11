@@ -1,4 +1,5 @@
 import socket
+from threading import Timer
 
 # constants
 RTT = 1
@@ -7,6 +8,7 @@ FILE_PATH = ""
 CHUNK_SIZE = 1012
 
 file_chunks = []
+timer = Timer(1, timeout)
 
 # connect with agent
 send_addr = ('127.0.0.1', 31600)  
@@ -29,6 +31,11 @@ def sndfin():
 	print("send\tfin")
 
 def timeout(num):
+	timer = Timer(1, timeout)
+	timer.start()
+	# resnd all pkts in the window
+	for i in range(base,next_seq_num):
+		resndpkt(i)
 
 def main():
 
@@ -42,10 +49,16 @@ def main():
 	send_base = 1
 	next_seq_num = 1
 	win_size = 1
-	sndpkt(0)
 
 	while True:
 
+		# Send n files into pipeline
+		while (next_seq_num < send_base + win_size):
+			sndpkt(next_seq_num)
+			if( send_base == next_seq_num ):
+				timer = Timer(1, timeout)
+				timer.start()
+			next_seq_num ++
 
 	# finish
 	sndfin()
