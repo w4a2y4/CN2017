@@ -4,8 +4,8 @@ from threading import Timer
 
 RTT = 1
 PAYLOAD = 1024
-FILE_PATH = "agent.py"	# tmp file
-CHUNK_SIZE = 999
+FILE_PATH = "arr.png"	# tmp file
+CHUNK_SIZE = 900
 
 send_base = 1
 next_seq_num = 1
