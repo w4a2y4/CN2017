@@ -55,10 +55,13 @@ def main():
 
 	while True:
 
+		# Finish when all pckts are send & ack
+		if ( send_base > len(file_chunks) ):
+			break
 
 		# Send n files into pipeline
-		while (next_seq_num < send_base + win_size):
-			sndpkt(next_seq_num)
+		while ( next_seq_num < send_base + win_size ):
+			sndpkt( next_seq_num )
 			if( send_base == next_seq_num ):
 				timer = Timer(1, timeout)
 				timer.start()
@@ -78,6 +81,9 @@ def main():
 
 	# finish
 	sndfin()
+	resfin = json.loads( send_socket.recv( PAYLOAD ) )
+	if ( resfin['data'] == 'finack' ):
+		print("recv\tfinack")
 
 
 if __name__ == "__main__":
