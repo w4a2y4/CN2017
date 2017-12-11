@@ -1,4 +1,8 @@
 import socket
+import json
+import random
+
+PAYLOAD = 1024
 
 # connect with recver
 recv_addr = ('127.0.0.1', 31500)
@@ -11,8 +15,37 @@ send_socket.bind(send_addr)
 
 def main():
 
+	loss_cnt = 0
+	overall_cnt = 0
+
 	while True:
-		pass
+
+		# sender -> recver
+		if ( msg = send_socket.recv( PAYLOAD ) ):
+			overall_cnt += 1
+			pkt = json.loads( msg.decode('utf-8') )
+			print( "get\tdata\t#" + str(pkt['num']) )
+
+			# randomly drop it
+			if ( random.randint(0, 1) ):
+				loss_cnt += 1
+				rate = round( loss_cnt/overall_cnt, 4 )
+				print( "drop\tdata\t#" + str(pkt['num']) + ",\tloss rate = " + str(rate) )
+
+			else:
+				rate = round( loss_cnt/overall_cnt, 4 )
+				recv_socket.sendto( msg, recv_addr )
+				print( "fwd\tdata\t#" + str(pkt['num']) + ",\tloss rate = " + str(rate) )
+
+
+		# recver -> sender
+		else if ( msg = recv_socket.recv( PAYLOAD ) ):
+			pkt = json.loads( msg.decode('utf-8') )
+			print( "get\tack\t#" + str(pkt['num']) )
+			send_socket.sendto( msg, send_addr )
+			print( "get\tack\t#" + str(pkt['num']) )
+
+
 
 if __name__ == "__main__":
 
