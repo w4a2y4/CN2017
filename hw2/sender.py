@@ -9,6 +9,7 @@ FILE_PATH = ""
 CHUNK_SIZE = 999
 
 file_chunks = []
+threshold = 16
 timer = Timer(1, timeout)
 
 # connect with agent
@@ -32,6 +33,7 @@ def sndfin():
 	print("send\tfin")
 
 def timeout(num):
+	print("time\tout,\t\tthreshold = " + threshold)
 	timer = Timer(1, timeout)
 	timer.start()
 	# resnd all pkts in the window
@@ -53,6 +55,7 @@ def main():
 
 	while True:
 
+
 		# Send n files into pipeline
 		while (next_seq_num < send_base + win_size):
 			sndpkt(next_seq_num)
@@ -62,8 +65,16 @@ def main():
 			next_seq_num ++
 
 		# recv something
-		res = str( send_socket.recv( PAYLOAD ).decode('utf-8') )
-
+		res = json.loads( send_socket.recv( PAYLOAD ) )
+		if ( res['data'] != 'ack' ): pass
+		print("recv\tack\t#" + res['num'])
+		send_base = res['num'] + 1
+		if ( send_base == next_seq_num ):
+			try: timer.cancel()
+			except: pass
+		else:
+			timer = Timer(1, timeout)
+			timer.start()
 
 	# finish
 	sndfin()
