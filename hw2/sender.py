@@ -19,11 +19,11 @@ timer = Timer(1, {})
 send_addr = ('127.0.0.1', 31600)  
 send_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-def inttobyte(num):
-	arr = bytearray()
-	for i in (24,16,8,0):
-		arr.append( num >> i & 0xff)
-	return arr
+def inttobytes(num):
+	return (num).to_bytes(4, byteorder='big')
+
+def bytestoint(bytes):
+	return int.from_bytes(bytes, byteorder='big')
 
 def sndagent(pkt):
 	send_socket.sendto( pkt, send_addr )
@@ -31,20 +31,20 @@ def sndagent(pkt):
 def sndpkt(num):
 	global file_chunks, win_size
 	# make packet
-	pkt = inttobyte(num) + file_chunks[num-1]
+	pkt = inttobytes(num) + file_chunks[num-1]
 	# pkt = { 'num': num, 'data': file_chunks[num-1] }
 	sndagent(pkt)
 	print("send\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
 
 def resndpkt(num):
 	global file_chunks, win_size
-	pkt = inttobyte(num) + file_chunks[num-1]
+	pkt = inttobytes(num) + file_chunks[num-1]
 	# pkt = { 'num': num, 'data': file_chunks[num-1] }
 	sndagent(pkt)
 	print("resnd\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
 
 def sndfin():
-	pkt = inttobyte(0)
+	pkt = inttobytes(0)
 	# pkt = { 'num': -1, 'data': 'finish' }
 	sndagent(pkt)
 	print("send\tfin")
@@ -84,10 +84,10 @@ def main():
 			next_seq_num += 1
 
 		# recv something
-		res = json.loads( send_socket.recv( PAYLOAD ).decode('utf-8') )
-		if ( res['data'] != 'ack' ): pass
-		print("recv\tack\t#" + str(res['num']))
-		send_base = res['num'] + 1
+		res = send_socket.recv( PAYLOAD )
+		res_num = bytestoint(res[0:4])
+		print("recv\tack\t#" + str(res_num))
+		send_base = res_num + 1
 		if ( send_base == next_seq_num ):
 			try: timer.cancel()
 			except: pass
@@ -98,8 +98,8 @@ def main():
 	# finish
 	timer.cancel
 	sndfin()
-	resfin = json.loads( send_socket.recv( PAYLOAD ).decode('utf-8') )
-	if ( resfin['data'] == 'finack' ):
+	resfin = send_socket.recv( PAYLOAD )
+	if ( bytestoint(res[0:4]) == 0 ):
 		print("recv\tfinack")
 
 
