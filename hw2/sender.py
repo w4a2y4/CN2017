@@ -5,7 +5,7 @@ from threading import Timer
 RTT = 1
 PAYLOAD = 1024
 FILE_PATH = "arr.png"	# tmp file
-CHUNK_SIZE = 900
+CHUNK_SIZE = 1020
 
 send_base = 1
 next_seq_num = 1
@@ -19,24 +19,33 @@ timer = Timer(1, {})
 send_addr = ('127.0.0.1', 31600)  
 send_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+def inttobyte(num):
+	arr = bytearray()
+	for i in (24,16,8,0):
+		arr.append( num >> i & 0xff)
+	return arr
+
 def sndagent(pkt):
-	send_socket.sendto( json.dumps(pkt).encode('utf-8'), send_addr )
+	send_socket.sendto( pkt, send_addr )
 
 def sndpkt(num):
 	global file_chunks, win_size
 	# make packet
-	pkt = { 'num': num, 'data': file_chunks[num-1] }
+	pkt = inttobyte(num) + file_chunks[num-1]
+	# pkt = { 'num': num, 'data': file_chunks[num-1] }
 	sndagent(pkt)
 	print("send\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
 
 def resndpkt(num):
 	global file_chunks, win_size
-	pkt = { 'num': num, 'data': file_chunks[num-1] }
+	pkt = inttobyte(num) + file_chunks[num-1]
+	# pkt = { 'num': num, 'data': file_chunks[num-1] }
 	sndagent(pkt)
 	print("resnd\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
 
 def sndfin():
-	pkt = { 'num': -1, 'data': 'finish' }
+	pkt = inttobyte(0)
+	# pkt = { 'num': -1, 'data': 'finish' }
 	sndagent(pkt)
 	print("send\tfin")
 
@@ -54,7 +63,7 @@ def main():
 	global file_chunks, send_base, win_size, next_seq_num, timer
 
 	# read in the file
-	with open(FILE_PATH, "r") as f:
+	with open(FILE_PATH, "rb") as f:
 	    chunk = f.read(CHUNK_SIZE)
 	    while chunk:
 	        file_chunks.append(chunk)
