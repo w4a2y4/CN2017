@@ -25,28 +25,22 @@ def inttobytes(num):
 def bytestoint(bytes):
 	return int.from_bytes(bytes, byteorder='big')
 
-def sndagent(pkt):
-	send_socket.sendto( pkt, send_addr )
-
 def sndpkt(num):
 	global file_chunks, win_size
 	# make packet
 	pkt = inttobytes(num) + file_chunks[num-1]
-	# pkt = { 'num': num, 'data': file_chunks[num-1] }
-	sndagent(pkt)
+	send_socket.sendto( pkt, send_addr )
 	print("send\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
 
 def resndpkt(num):
 	global file_chunks, win_size
 	pkt = inttobytes(num) + file_chunks[num-1]
-	# pkt = { 'num': num, 'data': file_chunks[num-1] }
-	sndagent(pkt)
+	send_socket.sendto( pkt, send_addr )
 	print("resnd\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
 
 def sndfin():
 	pkt = inttobytes(0)
-	# pkt = { 'num': -1, 'data': 'finish' }
-	sndagent(pkt)
+	send_socket.sendto( pkt, send_addr )
 	print("send\tfin")
 
 def timeout():
