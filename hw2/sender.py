@@ -1,11 +1,12 @@
 import socket
+import json
 from threading import Timer
 
 # constants
 RTT = 1
 PAYLOAD = 1024
 FILE_PATH = ""
-CHUNK_SIZE = 1012
+CHUNK_SIZE = 999
 
 file_chunks = []
 timer = Timer(1, timeout)
@@ -16,18 +17,18 @@ send_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 def sndpkt(num):
 	# make packet
-	pkt = (num, file_chunks[num+1])
-	send_socket.send( pkt.encode('utf-8') )
+	pkt = { 'num': num, 'data': file_chunks[num+1] }
+	send_socket.send( json.dumps(pkt) )
 	print("send\tdata\t#" + num + ",\twinSize = " + win_size)
 
 def resndpkt(num):
-	pkt = (num, file_chunks[num+1])
-	send_socket.send( pkt.encode('utf-8') )
+	pkt = { 'num': num, 'data': file_chunks[num+1] }
+	send_socket.send( json.dumps(pkt) )
 	print("resnd\tdata\t#" + num + ",\twinSize = " + win_size)
 
 def sndfin():
-	pkt = (-1, "finish")
-	send_socket.send( pkt.encode('utf-8') )
+	pkt = { 'num': -1, 'data': 'finish' }
+	send_socket.send( json.dumps(pkt) )
 	print("send\tfin")
 
 def timeout(num):
@@ -59,6 +60,10 @@ def main():
 				timer = Timer(1, timeout)
 				timer.start()
 			next_seq_num ++
+
+		# recv something
+		res = str( send_socket.recv( PAYLOAD ).decode('utf-8') )
+
 
 	# finish
 	sndfin()
