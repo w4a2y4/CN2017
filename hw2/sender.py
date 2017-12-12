@@ -67,12 +67,8 @@ def main():
 
 	while True:
 
-		# Finish when all pckts are send & ack
-		if ( send_base > len(file_chunks) ):
-			break
-
 		# Send n files into pipeline
-		while ( next_seq_num < send_base + win_size and next_seq_num < len(file_chunks) ):
+		while ( next_seq_num < send_base + win_size and next_seq_num <= len(file_chunks) ):
 			sndpkt( next_seq_num )
 			if( send_base == next_seq_num ):
 				try: timer.cancel()
@@ -87,8 +83,8 @@ def main():
 		print("recv\tack\t#" + str(res_num))
 		send_base = res_num + 1
 
-		# finish
-		if ( res_num == len(file_chunks) - 1 ):
+		# finish when recv the last ack
+		if ( res_num == len(file_chunks) ):
 			try: timer.cancel()
 			except: pass
 			break
@@ -107,7 +103,6 @@ def main():
 			timer.start()
 
 	# finish
-	timer.cancel
 	sndfin()
 	resfin = agent_socket.recv( PAYLOAD )
 	if ( bytestoint(resfin[0:4]) == 0 ):
