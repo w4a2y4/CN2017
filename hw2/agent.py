@@ -3,6 +3,7 @@ import select
 import random
 
 PAYLOAD = 1024
+LOSS_RATE = 0.3
 
 # connect with recver
 recv_addr = ('127.0.0.1', 31500)
@@ -58,7 +59,7 @@ def main():
 				print( "get\tdata\t#" + str(pkt_num) )
 
 				# randomly drop it
-				if ( random.randint(0, 1) ):
+				if ( random.random() < LOSS_RATE ):
 					loss_cnt += 1
 					rate = round( loss_cnt/overall_cnt, 4 )
 					print( "drop\tdata\t#" + str(pkt_num) + ",\tloss rate = " + str(rate) )

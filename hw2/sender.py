@@ -4,7 +4,7 @@ from threading import Timer
 
 RTT = 1
 PAYLOAD = 1024
-FILE_PATH = "test/bla.jpg"	# tmp file
+FILE_PATH = "test/pdf.pdf"	# tmp file
 CHUNK_SIZE = 1020
 
 send_base = 1
