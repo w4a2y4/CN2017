@@ -1,4 +1,5 @@
 import socket
+import math
 from threading import Timer
 
 RTT = 1
@@ -43,17 +44,19 @@ def sndfin():
 	print("send\tfin")
 
 def timeout():
-	global timer, threshold, next_seq_num, send_base
+	global timer, win_size, threshold, next_seq_num, send_base
 	print("time\tout,\t\tthreshold = " + str(threshold))
 	timer = Timer(RTT, timeout)
 	timer.start()
+	threshold = max( math.floor( win_size/2 ), 1 )
+	win_size = 1
 	# resnd all pkts in the window
 	for i in range(send_base, next_seq_num):
 		resndpkt(i)
 
 def main():
 
-	global file_chunks, send_base, win_size, next_seq_num, timer
+	global file_chunks, send_base, win_size, threshold, next_seq_num, timer
 
 	# read in the file
 	with open(FILE_PATH, "rb") as f:
@@ -69,9 +72,11 @@ def main():
 			break
 
 		# Send n files into pipeline
-		while ( next_seq_num < send_base + win_size ):
+		while ( next_seq_num < send_base + win_size and next_seq_num < len(file_chunks) ):
 			sndpkt( next_seq_num )
 			if( send_base == next_seq_num ):
+				try: timer.cancel()
+				except: pass
 				timer = Timer(RTT, timeout)
 				timer.start()
 			next_seq_num += 1
@@ -81,10 +86,16 @@ def main():
 		res_num = bytestoint(res[0:4])
 		print("recv\tack\t#" + str(res_num))
 		send_base = res_num + 1
+
 		if ( send_base == next_seq_num ):
+			# not congest
 			try: timer.cancel()
 			except: pass
+			if ( win_size < threshold ): win_size *= 2
+			else: win_size += 2
 		else:
+			try: timer.cancel()
+			except: pass
 			timer = Timer(RTT, timeout)
 			timer.start()
 
