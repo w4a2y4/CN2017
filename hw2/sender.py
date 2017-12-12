@@ -87,12 +87,19 @@ def main():
 		print("recv\tack\t#" + str(res_num))
 		send_base = res_num + 1
 
-		if ( send_base == next_seq_num ):
+		# finish
+		if ( res_num == len(file_chunks) - 1 ):
+			try: timer.cancel()
+			except: pass
+			break
+
+		elif ( send_base == next_seq_num ):
 			# not congest
 			try: timer.cancel()
 			except: pass
 			if ( win_size < threshold ): win_size *= 2
 			else: win_size += 2
+
 		else:
 			try: timer.cancel()
 			except: pass
@@ -103,7 +110,7 @@ def main():
 	timer.cancel
 	sndfin()
 	resfin = agent_socket.recv( PAYLOAD )
-	if ( bytestoint(res[0:4]) == 0 ):
+	if ( bytestoint(resfin[0:4]) == 0 ):
 		print("recv\tfinack")
 
 
