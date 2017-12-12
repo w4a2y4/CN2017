@@ -9,9 +9,11 @@ recv_addr = ('127.0.0.1', 31500)
 recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # create socket
-send_addr = ('127.0.0.1', 31600)
+agent_addr = ('127.0.0.1', 31600)
 send_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-send_socket.bind(send_addr)
+send_socket.bind(agent_addr)
+
+send_addr = ('', 0)
 
 def inttobytes(num):
 	return (num).to_bytes(4, byteorder='big')
@@ -20,6 +22,8 @@ def bytestoint(bytes):
 	return int.from_bytes(bytes, byteorder='big')
 
 def main():
+
+	global send_addr
 
 	loss_cnt = 0
 	overall_cnt = 0
@@ -40,6 +44,7 @@ def main():
 
 			# sender -> recver
 			else:
+				send_addr = addr
 				overall_cnt += 1
 				print( "get\tdata\t#" + str(pkt_num) )
 

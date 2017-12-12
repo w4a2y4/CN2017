@@ -15,8 +15,8 @@ threshold = 16
 timer = Timer(1, {})
 
 # connect with agent
-send_addr = ('127.0.0.1', 31600)  
-send_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+agent_addr = ('127.0.0.1', 31600)  
+agent_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 def inttobytes(num):
 	return (num).to_bytes(4, byteorder='big')
@@ -28,18 +28,18 @@ def sndpkt(num):
 	global file_chunks, win_size
 	# make packet
 	pkt = inttobytes(num) + file_chunks[num-1]
-	send_socket.sendto( pkt, send_addr )
+	agent_socket.sendto( pkt, agent_addr )
 	print("send\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
 
 def resndpkt(num):
 	global file_chunks, win_size
 	pkt = inttobytes(num) + file_chunks[num-1]
-	send_socket.sendto( pkt, send_addr )
+	agent_socket.sendto( pkt, agent_addr )
 	print("resnd\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
 
 def sndfin():
 	pkt = inttobytes(0)
-	send_socket.sendto( pkt, send_addr )
+	agent_socket.sendto( pkt, agent_addr )
 	print("send\tfin")
 
 def timeout():
@@ -77,7 +77,7 @@ def main():
 			next_seq_num += 1
 
 		# recv something
-		res = send_socket.recv( PAYLOAD )
+		res = agent_socket.recv( PAYLOAD )
 		res_num = bytestoint(res[0:4])
 		print("recv\tack\t#" + str(res_num))
 		send_base = res_num + 1
@@ -91,7 +91,7 @@ def main():
 	# finish
 	timer.cancel
 	sndfin()
-	resfin = send_socket.recv( PAYLOAD )
+	resfin = agent_socket.recv( PAYLOAD )
 	if ( bytestoint(res[0:4]) == 0 ):
 		print("recv\tfinack")
 
