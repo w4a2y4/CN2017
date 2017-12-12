@@ -1,7 +1,7 @@
 import socket
 
 PAYLOAD = 1024
-FILE_PATH = "arr2.png"	# tmp file to write
+FILE_PATH = "test/bla2.jpg"	# tmp file to write
 CHUNK_SIZE = 1020
 
 # create socket between recver & agent

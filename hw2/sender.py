@@ -3,7 +3,7 @@ from threading import Timer
 
 RTT = 1
 PAYLOAD = 1024
-FILE_PATH = "arr.png"	# tmp file
+FILE_PATH = "test/bla.jpg"	# tmp file
 CHUNK_SIZE = 1020
 
 send_base = 1
