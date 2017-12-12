@@ -1,6 +1,5 @@
 import socket
 import select
-import json
 import random
 
 PAYLOAD = 1024

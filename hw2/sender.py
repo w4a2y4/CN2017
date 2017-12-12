@@ -1,5 +1,4 @@
 import socket
-import json
 from threading import Timer
 
 RTT = 1
