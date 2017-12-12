@@ -3,7 +3,7 @@ import socket
 PAYLOAD = 1024
 FILE_PATH = "test/bla2.jpg"	# tmp file to write
 CHUNK_SIZE = 1020
-BUFF_SIZE = 2
+BUFF_SIZE = 32
 
 # create socket between recver & agent
 recv_addr = ('127.0.0.1', 31500)
