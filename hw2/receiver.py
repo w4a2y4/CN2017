@@ -3,6 +3,7 @@ import socket
 PAYLOAD = 1024
 FILE_PATH = "test/bla2.jpg"	# tmp file to write
 CHUNK_SIZE = 1020
+BUFF_SIZE = 2
 
 # create socket between recver & agent
 recv_addr = ('127.0.0.1', 31500)
@@ -19,6 +20,8 @@ def main():
 
 	expected_seq_num = 1
 	w = open(FILE_PATH, 'wb')
+	buffer = b''
+	buff_len = 0
 
 	while True:
 
@@ -36,14 +39,27 @@ def main():
 
 		# expected packet
 		if ( pkt_num == expected_seq_num ):
-			recv_socket.sendto( inttobytes(expected_seq_num), agent_addr )
-			print("send\tack\t#" + str(expected_seq_num))
-			expected_seq_num += 1
-			w.write(pkt[4:])
+
+			# buffer full, flush
+			if ( buff_len == BUFF_SIZE ):
+				print("flush")
+				w.write(buffer)
+				buffer = b''
+				buff_len = 0
+			else:
+				recv_socket.sendto( inttobytes(expected_seq_num), agent_addr )
+				print("send\tack\t#" + str(expected_seq_num))
+				expected_seq_num += 1
+				buffer += pkt[4:]
+				buff_len += 1
 
 		else:
 			recv_socket.sendto( inttobytes(expected_seq_num-1), agent_addr )
 			print("send\tack\t#" + str(expected_seq_num-1))
+
+	if ( buff_len ):
+		print("flush")
+		w.write(buffer)
 
 	w.close()
 
