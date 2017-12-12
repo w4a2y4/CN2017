@@ -33,13 +33,17 @@ def main():
 			break
 
 		print("recv\tdata\t#" + str(pkt_num))
-		recv_socket.sendto( pkt[0:4], agent_addr )
-		print("send\tack\t#" + str(expected_seq_num))
 
 		# expected packet
 		if ( pkt_num == expected_seq_num ):
+			recv_socket.sendto( inttobytes(expected_seq_num), agent_addr )
+			print("send\tack\t#" + str(expected_seq_num))
 			expected_seq_num += 1
 			w.write(pkt[4:])
+
+		else:
+			recv_socket.sendto( inttobytes(expected_seq_num-1), agent_addr )
+			print("send\tack\t#" + str(expected_seq_num-1))
 
 	w.close()
 
