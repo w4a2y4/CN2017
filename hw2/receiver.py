@@ -24,9 +24,18 @@ def main():
 
 		pkt, agent_addr = recv_socket.recvfrom( PAYLOAD )
 		pkt_num = bytestoint(pkt[0:4])
+
+		# finish
+		if ( pkt_num == 0 ):
+			print("recv\tfin")
+			recv_socket.sendto( inttobytes(0), agent_addr )
+			print("send\tfinack")
+			break
+
 		print("recv\tdata\t#" + str(pkt_num))
 		recv_socket.sendto( pkt[0:4], agent_addr )
 		print("send\tack\t#" + str(expected_seq_num))
+
 		# expected packet
 		if ( pkt_num == expected_seq_num ):
 			expected_seq_num += 1

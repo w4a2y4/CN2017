@@ -27,8 +27,9 @@ def main():
 
 	loss_cnt = 0
 	overall_cnt = 0
+	finish = False
 
-	while True:
+	while not finish:
 
 		ready_socks,_,_ = select.select([recv_socket, send_socket], [], []) 
 
@@ -41,6 +42,14 @@ def main():
 				print( "get\tack\t#" + str(pkt_num) )
 				send_socket.sendto( pkt, send_addr )
 				print( "fwd\tack\t#" + str(pkt_num) )
+
+			# finish
+			elif ( pkt_num == 0 ):
+				print( "get\tfin" )
+				recv_socket.sendto( pkt, recv_addr )
+				print( "fwd\tfin" )
+				finish = True
+				break
 
 			# sender -> recver
 			else:
@@ -58,6 +67,11 @@ def main():
 					rate = round( loss_cnt/overall_cnt, 4 )
 					recv_socket.sendto( pkt, recv_addr )
 					print( "fwd\tdata\t#" + str(pkt_num) + ",\tloss rate = " + str(rate) )
+
+	finack, addr = recv_socket.recvfrom( PAYLOAD )
+	print( "get\tfinack" )
+	send_socket.sendto( finack, send_addr )
+	print( "fwd\tfinack" )
 
 
 if __name__ == "__main__":
