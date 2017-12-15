@@ -3,7 +3,7 @@ import select
 import random
 
 PAYLOAD = 1024
-LOSS_RATE = 0.3
+LOSS_RATE = 0.1
 
 # connect with recver
 recv_addr = ('127.0.0.1', 31500)

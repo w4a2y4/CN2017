@@ -1,7 +1,7 @@
 import socket
 
 PAYLOAD = 1024
-FILE_PATH = "test/pdf2.pdf"	# tmp file to write
+FILE_PATH = "test/result.pdf.pdf"	# tmp file to write
 CHUNK_SIZE = 1020
 BUFF_SIZE = 32
 
