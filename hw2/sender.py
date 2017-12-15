@@ -86,13 +86,15 @@ def main():
 		res_num = bytestoint(res[0:4])
 		print("recv\tack\t#" + str(res_num))
 
+		send_base = res_num + 1
+
 		# finish when recv the last ack
 		if ( res_num == len(file_chunks) ):
 			try: timer.cancel()
 			except: pass
 			break
 
-		elif ( send_base == res_num ):
+		elif ( send_base == next_seq_num ):
 			# not congest
 			try: timer.cancel()
 			except: pass
@@ -104,8 +106,7 @@ def main():
 			except: pass
 			timer = Timer(RTT, timeout)
 			timer.start()
-
-		send_base = res_num + 1
+		
 
 	# finish
 	sndfin()
