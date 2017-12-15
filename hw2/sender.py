@@ -52,7 +52,7 @@ def timeout():
 	timer = Timer(RTT, timeout)
 	timer.start()
 	threshold = max( math.floor( win_size/2 ), 1 )
-	# resnd all pkts in the window
+	# resnd all pkts
 	for i in range(send_base, next_seq_num):
 		resndpkt(i)
 	win_size = 1
@@ -85,8 +85,11 @@ def main():
 		res = agent_socket.recv( PAYLOAD )
 		res_num = bytestoint(res[0:4])
 		print("recv\tack\t#" + str(res_num))
-
 		send_base = res_num + 1
+
+		if ( next_seq_num < send_base + win_size ):
+			if ( win_size < threshold ): win_size *= 2
+			else: win_size += 1
 
 		# finish when recv the last ack
 		if ( res_num == len(file_chunks) ):
@@ -98,8 +101,6 @@ def main():
 			# not congest
 			try: timer.cancel()
 			except: pass
-			if ( win_size < threshold ): win_size *= 2
-			else: win_size += 1
 
 		else:
 			try: timer.cancel()
