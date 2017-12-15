@@ -30,15 +30,13 @@ def sndpkt(num):
 	# make packet
 	pkt = inttobytes(num) + file_chunks[num-1]
 	agent_socket.sendto( pkt, agent_addr )
-	# print("send\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
-	print("send\tdata\t#" + str(num) + ",\twinSize = " + str(win_size) + ",\tbase = " + str(send_base))
+	print("send\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
 
 def resndpkt(num):
 	global file_chunks, win_size, send_base
 	pkt = inttobytes(num) + file_chunks[num-1]
 	agent_socket.sendto( pkt, agent_addr )
-	# print("resnd\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
-	print("resnd\tdata\t#" + str(num) + ",\twinSize = " + str(win_size) + ",\tbase = " + str(send_base))
+	print("resnd\tdata\t#" + str(num) + ",\twinSize = " + str(win_size))
 
 
 def sndfin():
